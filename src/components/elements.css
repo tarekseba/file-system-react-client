@@ -1,0 +1,40 @@
+.folder__header {
+  padding: 0.1rem;
+  padding-left: 0.3rem;
+  padding-right: 0.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 0.3rem;
+  transition: all 200ms ease-in-out;
+  cursor: pointer;
+}
+
+.folder__header:hover {
+  background-color: rgba(128, 128, 128, 0.331);
+}
+
+.clickable__container {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 0.3rem;
+}
+
+.clickable:hover {
+  color: rgba(76, 76, 228, 0.904);
+  transition: all 200ms ease-in-out;
+  cursor: pointer;
+}
+
+.space {
+  margin-left: 0.5rem;
+}
+
+.displayable {
+  display: none;
+}
+
+.folder__header:hover > .displayable {
+  display: block;
+}
