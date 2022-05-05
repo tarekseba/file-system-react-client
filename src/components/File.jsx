@@ -12,7 +12,7 @@ const File = (props) => {
         <span>{props.name}</span>
       </div>
       <i
-        class="fa-solid fa-trash clickable displayable"
+        className="fa-solid fa-trash clickable displayable"
         style={{ marginLeft: "auto" }}
         onClick={() => {
           props.onDelete(props.index);
