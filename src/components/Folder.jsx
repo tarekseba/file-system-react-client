@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import File from "./File";
 import Modal from "./Modal/Modal";
 
@@ -7,12 +7,85 @@ const Folder = (props) => {
   const [modal, setModal] = useState(false);
   const [items, setItems] = useState([]);
   const [type, setType] = useState("");
-  useEffect(() => {
-    setItems([
-      { type: "FILE", name: "tarekFile" },
-      { type: "FOLDER", name: "tarekFolder" },
-    ]);
-  }, []);
+  const [uploadErr, setUploadErr] = useState(false);
+
+  const fetchItems = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:8081" + props.path + props.name,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === 200) {
+        const data = await response.json();
+        setItems([...data.result]);
+      } else {
+        console.log("FILES NOT FOUND");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const size = useMemo(
+    () =>
+      isExpanded
+        ? items.reduce((sum, item) => {
+            return sum + item.size;
+          }, 0)
+        : props.size,
+    [isExpanded, items, props]
+  );
+
+  const uploadEntity = async (data) => {
+    setUploadErr(false);
+    try {
+      const response = await fetch(
+        "http://localhost:8081" + props.path + props.name,
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      if (response.status !== 200) throw new Error("Failed to upload file");
+      setItems((state) => {
+        state.push({
+          name: data.name,
+          type: data.type,
+          size: data.type === "FILE" ? data.content.length : 0,
+        });
+        return [...state];
+      });
+      setModal(false);
+    } catch (err) {
+      console.log(err);
+      setUploadErr(true);
+    }
+  };
+
+  const deleteEntity = async () => {
+    try {
+      const response = await fetch(
+        "http://192.168.0.18:8080" + props.path + props.name,
+        { method: "DELETE" }
+      );
+      if (response.status !== 200) {
+        throw new Error("Deletion failed");
+      }
+      props.onDelete(props.index);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const onDeleteHandler = () => {
+    deleteEntity();
+  };
 
   const deleteHandler = (index) => {
     let newItems = [...items];
@@ -23,10 +96,12 @@ const Folder = (props) => {
   const linkSubmitHandler = (data) => {
     let body = {
       name: data.name,
-      content: data.path,
+      content: null,
       type: "FOLDER",
+      path: data.path,
     };
     console.log(body);
+    uploadEntity(body);
   };
 
   const folderSubmitHandler = (data) => {
@@ -34,8 +109,10 @@ const Folder = (props) => {
       name: data.name,
       content: null,
       type: "FOLDER",
+      path: null,
     };
     console.log(body);
+    uploadEntity(body);
   };
 
   const fileSubmitHandler = (file) => {
@@ -46,11 +123,13 @@ const Folder = (props) => {
         name: file.files[0].name,
         type: "FILE",
         content: new Int8Array(e.target.result),
+        path: null,
       };
       console.log(data);
+      uploadEntity(data);
     };
-    console.log(file.files[0]);
-    console.log(file.files[0].name);
+    // console.log(file.files[0]);
+    // console.log(file.files[0].name);
   };
 
   return (
@@ -62,12 +141,16 @@ const Folder = (props) => {
           onLinkSubmit={linkSubmitHandler}
           onFolderSubmit={folderSubmitHandler}
           onFileSubmit={fileSubmitHandler}
+          err={uploadErr}
         ></Modal>
       )}
       <div>
         <div
           className="folder__header"
-          onClick={() => setIsExpanded((state) => !state)}
+          onClick={() => {
+            fetchItems();
+            setIsExpanded((state) => !state);
+          }}
         >
           <div className="clickable__container clickable">
             {!isExpanded && <i className="fa-solid fa-folder"></i>}
@@ -78,6 +161,12 @@ const Folder = (props) => {
               ></i>
             )}
             <span>{props.name}</span>
+            <span
+              style={{ fontSize: "10px", marginLeft: ".6rem", color: "gray" }}
+              className="displayable"
+            >
+              {size} BYTE
+            </span>
           </div>
           <i
             className="fa-solid fa-file-circle-plus clickable displayable"
@@ -106,8 +195,9 @@ const Folder = (props) => {
           ></i>
           <i
             className="fa-solid fa-trash clickable space displayable"
-            onClick={() => {
-              props.onDelete(props.index);
+            onClick={(event) => {
+              event.stopPropagation();
+              onDeleteHandler();
             }}
           ></i>
         </div>
@@ -118,9 +208,11 @@ const Folder = (props) => {
                 return (
                   <File
                     name={item.name}
+                    content={item.content}
                     path={`${props.path}${props.name}/`}
                     index={index}
                     key={`${props.path}${props.name}/${item.name}`}
+                    size={item.size}
                     onDelete={deleteHandler}
                   ></File>
                 );
@@ -130,6 +222,7 @@ const Folder = (props) => {
                   path={`${props.path}${props.name}/`}
                   index={index}
                   key={`${props.path}${props.name}/${item.name}`}
+                  size={item.size}
                   onDelete={deleteHandler}
                 ></Folder>
               );

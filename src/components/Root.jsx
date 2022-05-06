@@ -9,23 +9,19 @@ const Root = () => {
   const [modal, setModal] = useState(false);
   const [items, setItems] = useState([]);
   const [type, setType] = useState("");
+  const [uploadErr, setUploadErr] = useState(false);
   const deleteHandler = (index) => {
     let newItems = [...items];
     newItems.splice(index, 1);
     setItems([...newItems]);
   };
   useEffect(() => {
-    // setItems([
-    //   { type: "FILE", name: "tarekFile" },
-    //   { type: "FOLDER", name: "tarekFolder" },
-    //   { type: "FOLDER", name: "tarekFolder2" },
-    // ]);
     fetchItems();
   }, []);
 
   const fetchItems = async () => {
     try {
-      const response = await fetch("http://localhost:8080/", {
+      const response = await fetch("http://localhost:8081/", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +30,7 @@ const Root = () => {
       if (response.status === 200) {
         const data = await response.json();
         console.log(data);
-        // setItems([...data.result]);
+        setItems([...data.result]);
       } else {
         console.log("FILES NOT FOUND");
       }
@@ -43,13 +39,40 @@ const Root = () => {
     }
   };
 
+  const uploadEntity = async (data) => {
+    setUploadErr(false);
+    //data.content = null;
+    try {
+      const response = await fetch("http://localhost:8081/", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (response.status !== 200) throw new Error("Failed to upload file");
+      setItems((state) => {
+        state.push({
+          name: data.name,
+          type: data.type,
+          size: data.type === "FILE" ? data.content.length : 0,
+        });
+        return [...state];
+      });
+      setModal(false);
+    } catch (err) {
+      console.log(err);
+      setUploadErr(true);
+    }
+  };
+
   const linkSubmitHandler = (data) => {
     let body = {
       name: data.name,
-      content: data.path,
+      content: null,
       type: "FOLDER",
+      path: data.path,
     };
     console.log(body);
+    uploadEntity(body);
   };
 
   const folderSubmitHandler = (data) => {
@@ -57,8 +80,10 @@ const Root = () => {
       name: data.name,
       content: null,
       type: "FOLDER",
+      path: null,
     };
     console.log(body);
+    uploadEntity(body);
   };
 
   const fileSubmitHandler = (file) => {
@@ -69,11 +94,13 @@ const Root = () => {
         name: file.files[0].name,
         type: "FILE",
         content: new Int8Array(e.target.result),
+        path: null,
       };
       console.log(data);
+      uploadEntity(data);
     };
-    console.log(file.files[0]);
-    console.log(file.files[0].name);
+    // console.log(file.files[0]);
+    // console.log(file.files[0].name);
   };
 
   return (
@@ -82,6 +109,7 @@ const Root = () => {
         <Modal
           type={type}
           close={setModal}
+          err={uploadErr}
           onLinkSubmit={linkSubmitHandler}
           onFolderSubmit={folderSubmitHandler}
           onFileSubmit={fileSubmitHandler}
@@ -136,8 +164,10 @@ const Root = () => {
                   <File
                     key={`/${item.name}`}
                     name={item.name}
+                    content={item.content}
                     path={"/"}
                     index={index}
+                    size={item.size}
                     onDelete={deleteHandler}
                   ></File>
                 );
@@ -147,6 +177,7 @@ const Root = () => {
                   name={item.name}
                   path={"/"}
                   index={index}
+                  size={item.size}
                   onDelete={deleteHandler}
                 ></Folder>
               );

@@ -1,5 +1,5 @@
 import { ThemeProvider } from "@emotion/react";
-import { Button, createTheme, Input, TextField } from "@mui/material";
+import { Button, createTheme, TextField } from "@mui/material";
 import { useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 
@@ -15,10 +15,10 @@ let theme = createTheme({
 
 const ModalContent = ({
   type,
-  path,
   onFolderSubmit,
   onFileSubmit,
   onLinkSubmit,
+  err,
 }) => {
   let content;
 
@@ -74,7 +74,21 @@ const ModalContent = ({
                 },
               }}
             ></Controller>
-
+            {err && (
+              <div
+                style={{
+                  padding: ".5rem 2rem",
+                  borderStyle: "solid ",
+                  borderColor: "#5f2120",
+                  borderRadius: "6px",
+                  textAlign: "center",
+                  backgroundColor: "#fdeded",
+                  color: "#5f2120",
+                }}
+              >
+                A server error occurred
+              </div>
+            )}
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <Button variant="contained" type="submit" disabled={false}>
                 Submit
@@ -118,7 +132,22 @@ const ModalContent = ({
               required={true}
               ref={file}
             ></input>
-
+            {err && (
+              <div
+                style={{
+                  display: "block",
+                  padding: ".5rem 2rem",
+                  borderStyle: "solid ",
+                  borderColor: "#5f2120",
+                  borderRadius: "6px",
+                  textAlign: "center",
+                  backgroundColor: "#fdeded",
+                  color: "#5f2120",
+                }}
+              >
+                A server error occurred
+              </div>
+            )}
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <Button variant="contained" type="submit" disabled={false}>
                 Submit
@@ -179,7 +208,22 @@ const ModalContent = ({
                 },
               }}
             ></Controller>
-
+            {err && (
+              <div
+                style={{
+                  display: "block",
+                  padding: ".5rem 2rem",
+                  borderStyle: "solid ",
+                  borderColor: "#5f2120",
+                  borderRadius: "6px",
+                  textAlign: "center",
+                  backgroundColor: "#fdeded",
+                  color: "#5f2120",
+                }}
+              >
+                A server error occurred
+              </div>
+            )}
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <Button variant="contained" type="submit" disabled={false}>
                 Submit

@@ -38,3 +38,7 @@
 .folder__header:hover > .displayable {
   display: block;
 }
+
+.folder__header:hover > div > .displayable {
+  display: block;
+}

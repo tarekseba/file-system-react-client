@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import ModalContent from "./ModalContent/ModalContent";
 
 const Modal = (props) => {
-  const { type, close, onFolderSubmit, onFileSubmit, onLinkSubmit } =
+  const { type, close, onFolderSubmit, onFileSubmit, onLinkSubmit, err } =
     props;
   return createPortal(
     <div
@@ -22,6 +22,7 @@ const Modal = (props) => {
         onFileSubmit={onFileSubmit}
         onFolderSubmit={onFolderSubmit}
         onLinkSubmit={onLinkSubmit}
+        err={err}
       ></ModalContent>
       {/* <Content
         difficulty={difficulty}
