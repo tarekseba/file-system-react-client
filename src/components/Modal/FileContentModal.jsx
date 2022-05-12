@@ -2,7 +2,7 @@ import "./FileContentModal.css";
 import { createPortal } from "react-dom";
 
 const FileContentModal = (props) => {
-  const { name, content, close } = props;
+  const { name, content, close, path } = props;
   return createPortal(
     <div
       className="modal__wrapper"
@@ -21,7 +21,17 @@ const FileContentModal = (props) => {
         }}
       >
         <div className="content__header">
-          <span>{name}</span>
+          <span>
+            {name}
+            {props.path ? (
+              <span style={{ color: "green" }}>
+                {" "}
+                <i className="fa-solid fa-right-long"></i> {" " + props.path}
+              </span>
+            ) : (
+              ""
+            )}
+          </span>
           <i
             className="fa-solid fa-circle-xmark"
             style={{ marginLeft: "auto", cursor: "pointer" }}
@@ -32,12 +42,6 @@ const FileContentModal = (props) => {
         </div>
         <div className="content__content">{content}</div>
       </div>
-      {/* <Content
-        difficulty={difficulty}
-        dispatch={close}
-        difficultyAction={difficultyAction}
-        winner={winner}
-      /> */}
     </div>,
     document.body
   );

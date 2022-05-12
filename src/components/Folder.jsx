@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import File from "./File";
+import Link from "./Link";
 import Modal from "./Modal/Modal";
 
 const Folder = (props) => {
@@ -22,7 +23,7 @@ const Folder = (props) => {
       );
       if (response.status === 200) {
         const data = await response.json();
-        setItems([...data.result]);
+        setItems([...data.result.folders, ...data.result.files, ...data.result.links]);
       } else {
         console.log("FILES NOT FOUND");
       }
@@ -71,7 +72,7 @@ const Folder = (props) => {
   const deleteEntity = async () => {
     try {
       const response = await fetch(
-        "http://192.168.0.18:8080" + props.path + props.name,
+        "http://127.0.0.1:8081" + props.path + props.name,
         { method: "DELETE" }
       );
       if (response.status !== 200) {
@@ -97,7 +98,7 @@ const Folder = (props) => {
     let body = {
       name: data.name,
       content: null,
-      type: "FOLDER",
+      type: "LINK",
       path: data.path,
     };
     console.log(body);
@@ -215,6 +216,18 @@ const Folder = (props) => {
                     size={item.size}
                     onDelete={deleteHandler}
                   ></File>
+                );
+              if (item.type === "LINK")
+                return (
+                  <Link
+                    name={item.name}
+                    content={item.content}
+                    path={`${props.path}${props.name}/`}
+                    index={index}
+                    key={`${props.path}${props.name}/${item.name}`}
+                    size={item.size}
+                    onDelete={deleteHandler}
+                  ></Link>
                 );
               return (
                 <Folder

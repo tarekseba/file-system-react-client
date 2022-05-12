@@ -35,7 +35,7 @@ const ModalContent = ({
   };
 
   const linkSubmitHandler = (data) => {
-    console.log(data);
+    onLinkSubmit(data);
   };
 
   const fileSubmitHandler = (event) => {
@@ -70,7 +70,7 @@ const ModalContent = ({
                 required: "Folder name required",
                 pattern: {
                   message: "Invalid folder name",
-                  value: /^[a-zA-Z._]+$/,
+                  value: /^[a-zA-Z._0-9]+$/,
                 },
               }}
             ></Controller>
@@ -109,23 +109,6 @@ const ModalContent = ({
               gap: " .7rem",
             }}
           >
-            {/* <Controller
-              name="file"
-              control={control}
-              render={({ field, fieldState: { error } }) => (
-                <Input
-                  type="file"
-                  variant="standard"
-                  label="Folder name"
-                  {...field}
-                  error={error ? true : false}
-                  inputRef={file}
-                ></Input>
-              )}
-              rules={{
-                required: "File required",
-              }}
-            ></Controller> */}
             <input
               type="file"
               label="Folder name"
@@ -174,7 +157,7 @@ const ModalContent = ({
               render={({ field, fieldState: { error } }) => (
                 <TextField
                   variant="standard"
-                  label="Folder name"
+                  label="Link name"
                   {...field}
                   error={error ? true : false}
                   helperText={error ? error.message : ""}
@@ -184,7 +167,7 @@ const ModalContent = ({
                 required: "Folder name required",
                 pattern: {
                   message: "Invalid folder name",
-                  value: /^[a-zA-Z._]+$/,
+                  value: /^[a-zA-Z._0-9]+$/,
                 },
               }}
             ></Controller>
@@ -194,7 +177,7 @@ const ModalContent = ({
               render={({ field, fieldState: { error } }) => (
                 <TextField
                   variant="standard"
-                  label="Path"
+                  label="Path to file"
                   {...field}
                   error={error ? true : false}
                   helperText={error ? error.message : ""}
@@ -204,7 +187,7 @@ const ModalContent = ({
                 required: "Path to file required",
                 pattern: {
                   message: "Invalid path",
-                  value: /^\/([a-zA-Z._])+(\/[a-zA-Z._]+)*$/,
+                  value: /^\/([a-zA-Z._0-9])+(\/[a-zA-Z._0-9]+)*/,
                 },
               }}
             ></Controller>

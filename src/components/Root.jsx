@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./elements.css";
 import File from "./File";
 import Folder from "./Folder";
+import Link from "./Link";
 import Modal from "./Modal/Modal";
 
 const Root = () => {
@@ -30,7 +31,7 @@ const Root = () => {
       if (response.status === 200) {
         const data = await response.json();
         console.log(data);
-        setItems([...data.result]);
+        setItems([...data.result.folders, ...data.result.files, ...data.result.links]);
       } else {
         console.log("FILES NOT FOUND");
       }
@@ -54,6 +55,7 @@ const Root = () => {
           name: data.name,
           type: data.type,
           size: data.type === "FILE" ? data.content.length : 0,
+          content: data.type === "LINK" ? data.path : null,
         });
         return [...state];
       });
@@ -68,8 +70,8 @@ const Root = () => {
     let body = {
       name: data.name,
       content: null,
-      type: "FOLDER",
-      path: data.path,
+      type: "LINK",
+      path: data.target,
     };
     console.log(body);
     uploadEntity(body);
@@ -170,6 +172,18 @@ const Root = () => {
                     size={item.size}
                     onDelete={deleteHandler}
                   ></File>
+                );
+              if (item.type === "LINK")
+                return (
+                  <Link
+                    name={item.name}
+                    content={item.content}
+                    path={"/"}
+                    index={index}
+                    key={`/${item.name}`}
+                    size={item.size}
+                    onDelete={deleteHandler}
+                  ></Link>
                 );
               return (
                 <Folder

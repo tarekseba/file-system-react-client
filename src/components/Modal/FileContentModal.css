@@ -29,7 +29,7 @@
   top: 2.5rem;
   width: 100%;
   height: calc(100% - 2.5rem);
-  padding: 1rem;
+  padding: 1rem 1.6rem;
   overflow-y: auto;
 }
 

@@ -23,6 +23,7 @@ const Modal = (props) => {
         onFolderSubmit={onFolderSubmit}
         onLinkSubmit={onLinkSubmit}
         err={err}
+        path={props.path}
       ></ModalContent>
       {/* <Content
         difficulty={difficulty}
